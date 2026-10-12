@@ -4,63 +4,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My DevOps To-Do App</title>
+    <title>TaskFlow | To-Do App</title>
     <style>
+        * { box-sizing: border-box; }
+
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
+            background: #f4f6fb;
+            color: #20243a;
+        }
+
+        header {
+            background: white;
             padding: 20px;
-            background: #f4f6f8;
+            border-bottom: 1px solid #e7eaf2;
         }
 
-        h1, h2 {
-            text-align: center;
+        .nav, .container {
+            width: min(900px, 92%);
+            margin: auto;
         }
 
-        form {
+        .nav { display: flex; align-items: center; gap: 12px; }
+
+        .logo {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: #635bdb;
+            color: white;
+            font-size: 22px;
+        }
+
+        .brand { font-size: 21px; font-weight: bold; }
+        .brand span { color: #635bdb; }
+
+        .container { padding: 40px 0; }
+
+        .intro { margin-bottom: 26px; }
+        .intro h1 { font-size: 34px; margin-bottom: 10px; }
+        .intro p { color: #747b91; line-height: 1.5; }
+
+        .task-panel {
+            background: white;
+            padding: 26px;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px #232a5010;
+        }
+
+        .task-form, .filters {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
 
-        input {
-            flex: 1;
-            padding: 10px;
+        input, select {
+            min-width: 0;
+            padding: 13px;
+            border: 1px solid #dfe3ee;
+            border-radius: 10px;
+            font-size: 14px;
         }
+
+        input[name="task"] { flex: 1; }
 
         button {
-            padding: 10px 15px;
+            border: 0;
+            border-radius: 9px;
+            padding: 12px 15px;
             cursor: pointer;
+            font-weight: bold;
         }
 
-        li {
-            margin: 15px 0;
+        .add-button, .complete-button {
+            background: #635bdb;
+            color: white;
+        }
+
+        .filters button {
+            background: #eeedff;
+            color: #5149bf;
+        }
+
+        .filters button.active { background: #635bdb; color: white; }
+
+        .task-list { list-style: none; padding: 0; margin: 0; }
+
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 17px 0;
+            border-top: 1px solid #edf0f6;
+        }
+
+        .task-info { min-width: 0; overflow-wrap: anywhere; }
+        .task-name { font-weight: 600; }
+        .done { text-decoration: line-through; color: #8b91a3; }
+
+        .priority {
+            display: inline-block;
+            margin-top: 7px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-transform: capitalize;
+        }
+
+        .low { background: #e1f7e9; color: #207044; }
+        .medium { background: #fff2d5; color: #8a5a00; }
+        .high { background: #ffe4e6; color: #b42335; }
+
+        .actions { display: flex; gap: 7px; flex-shrink: 0; }
+        .delete-button { background: #fff0f0; color: #c33b4a; }
+
+        .empty-state {
+            padding: 25px;
+            text-align: center;
+            color: #858ba0;
+            background: #f8f9fd;
+            border-radius: 12px;
+        }
+
+        footer {
+            text-align: center;
+            color: #858ba0;
+            font-size: 13px;
+            padding: 25px;
+        }
+
+        @media (max-width: 560px) {
+            .task-panel { padding: 18px; }
+            .task-form { flex-direction: column; }
+            .task-item { align-items: flex-start; flex-direction: column; }
+            .intro h1 { font-size: 29px; }
         }
     </style>
 </head>
 <body>
-    <h1>My DevOps To-Do App</h1>
+    <header>
+        <div class="nav">
+            <div class="logo">✓</div>
+            <div class="brand">Task<span>Flow</span></div>
+        </div>
+    </header>
 
-    <form action="/add" method="POST">
-        <input type="text" name="task"
-               placeholder="Enter a task" required>
-        <button type="submit">Add Task</button>
-    </form>
+    <main class="container">
+        <section class="intro">
+            <h1>Plan your day. ✨</h1>
+            <p>Organize your work, set priorities, and celebrate your progress.</p>
+        </section>
 
-    <h2>My Tasks</h2>
+        <section class="task-panel">
+            <h2>My Tasks</h2>
+            <p style="display:none;">My DevOps To-Do App</p>
 
-    <ul>
-        {% for task in tasks %}
-        <li>
-            {{ task }}
-            <form action="/delete/{{ loop.index0 }}"
-                  method="POST" style="display:inline;">
-                <button type="submit">Delete</button>
+            <form class="task-form" action="/add" method="POST">
+                <input type="text" name="task"
+                       placeholder="What do you need to do?"
+                       aria-label="New task" required>
+
+                <select name="priority" aria-label="Task priority">
+                    <option value="low">Low priority</option>
+                    <option value="medium" selected>Medium priority</option>
+                    <option value="high">High priority</option>
+                </select>
+
+                <button class="add-button" type="submit">+ Add Task</button>
             </form>
-        </li>
-        {% else %}
-        <li>No tasks yet. Add your first task!</li>
-        {% endfor %}
-    </ul>
+
+            <div class="filters">
+                <button type="button"
+                        class="{% if status_filter == 'all' %}active{% endif %}"
+                        onclick="location.href='/?status=all&amp;priority={{ priority_filter }}'">
+                    All
+                </button>
+                <button type="button"
+                        class="{% if status_filter == 'pending' %}active{% endif %}"
+                        onclick="location.href='/?status=pending&amp;priority={{ priority_filter }}'">
+                    Pending
+                </button>
+                <button type="button"
+                        class="{% if status_filter == 'completed' %}active{% endif %}"
+                        onclick="location.href='/?status=completed&amp;priority={{ priority_filter }}'">
+                    Completed
+                </button>
+            </div>
+
+            <form class="filters" action="/" method="GET">
+                <input type="hidden" name="status" value="{{ status_filter }}">
+                <label for="priority-filter">Filter priority:</label>
+                <select id="priority-filter" name="priority" onchange="this.form.submit()">
+                    <option value="all" {% if priority_filter == 'all' %}selected{% endif %}>All priorities</option>
+                    <option value="low" {% if priority_filter == 'low' %}selected{% endif %}>Low</option>
+                    <option value="medium" {% if priority_filter == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="high" {% if priority_filter == 'high' %}selected{% endif %}>High</option>
+                </select>
+            </form>
+
+            {% if tasks %}
+                <ul class="task-list">
+                    {% for task in tasks %}
+                        <li class="task-item">
+                            <div class="task-info">
+                                <div class="task-name {% if task.completed %}done{% endif %}">
+                                    {{ task.name }}
+                                </div>
+                                <span class="priority {{ task.priority }}">
+                                    {{ task.priority }} priority
+                                </span>
+                            </div>
+
+                            <div class="actions">
+                                <form action="/complete/{{ task.id }}" method="POST">
+                                    <button class="complete-button" type="submit">
+                                        {% if task.completed %}Undo{% else %}Complete{% endif %}
+                                    </button>
+                                </form>
+
+                                <form action="/delete/{{ task.id }}" method="POST">
+                                    <button class="delete-button" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="empty-state">
+                    <p>📝 No tasks found.</p>
+                    <p>Add a task or change your filters.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>TaskFlow · Built with Flask and DevOps</footer>
 </body>
 </html>
